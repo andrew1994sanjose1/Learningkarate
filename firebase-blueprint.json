@@ -1,0 +1,78 @@
+{
+  "entities": {
+    "user": {
+      "title": "User",
+      "description": "User profile and karate progress",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "displayName": { "type": "string" },
+        "rank": { "type": "string", "enum": ["White", "Yellow", "Orange", "Green", "Blue", "Purple", "Brown", "Black"] },
+        "beltProgress": { "type": "number", "description": "Percentage progress to next belt" },
+        "attendanceCount": { "type": "integer" },
+        "qrCode": { "type": "string", "description": "Unique ID for QR check-in" },
+        "role": { "type": "string", "enum": ["student", "instructor", "admin"] },
+        "joinedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "email", "role"]
+    },
+    "attendance": {
+      "title": "Attendance",
+      "description": "Log of class attendance",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "classId": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "status": { "type": "string", "enum": ["present", "excused"] }
+      },
+      "required": ["userId", "timestamp"]
+    },
+    "class": {
+      "title": "Class",
+      "description": "Available karate classes",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "instructorId": { "type": "string" },
+        "schedule": { "type": "string", "description": "Weekly schedule string, e.g., 'Mon 17:00'" },
+        "category": { "type": "string", "enum": ["Peewees", "Juniors", "Adults", "Elite"] }
+      },
+      "required": ["id", "name", "category"]
+    },
+    "product": {
+      "title": "Product",
+      "description": "Dojo shop items",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "price": { "type": "number" },
+        "category": { "type": "string", "enum": ["Gi", "Sparring Gear", "Apparel", "Equipment"] },
+        "imageUrl": { "type": "string" },
+        "stock": { "type": "integer" }
+      },
+      "required": ["id", "name", "price"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "user",
+      "description": "User profiles"
+    },
+    "/attendance/{attendanceId}": {
+      "schema": "attendance",
+      "description": "Attendance logs"
+    },
+    "/classes/{classId}": {
+      "schema": "class",
+      "description": "Class directory"
+    },
+    "/products/{productId}": {
+      "schema": "product",
+      "description": "Shop inventory"
+    }
+  }
+}

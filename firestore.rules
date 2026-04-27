@@ -1,0 +1,52 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isSignedIn() { return request.auth != null; }
+    function isOwner(userId) { return isSignedIn() && request.auth.uid == userId; }
+    function isAdmin() { 
+      return isSignedIn() && 
+      get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+    function isValidId(id) { return id is string && id.size() <= 128; }
+
+    // User profiles
+    match /users/{userId} {
+      allow get: if isOwner(userId) || isAdmin();
+      allow list: if isAdmin();
+      allow create: if isSignedIn() && request.auth.uid == userId;
+      allow update: if isOwner(userId) && (
+        !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role', 'uid', 'email'])
+      ) || isAdmin();
+    }
+
+    // Attendance logs
+    match /attendance/{attendanceId} {
+      allow list: if isSignedIn() && resource.data.userId == request.auth.uid || isAdmin();
+      allow get: if isSignedIn() && resource.data.userId == request.auth.uid || isAdmin();
+      allow create: if isAdmin() || (
+        isSignedIn() && request.resource.data.userId == request.auth.uid && 
+        request.resource.data.status == 'present' &&
+        request.resource.data.timestamp == request.time
+      );
+      allow update, delete: if isAdmin();
+    }
+
+    // Classes directory
+    match /classes/{classId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Shop inventory
+    match /products/{productId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+  }
+}

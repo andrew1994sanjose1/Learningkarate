@@ -1,0 +1,6 @@
+{
+  "name": "Zenith Karate Academy",
+  "description": "A modern, high-converting website for a professional karate school featuring a member portal, QR check-in, dynamic scheduling, and an integrated gear shop.",
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": ["Member Portal", "QR Attendance", "Stripe Payments", "E-Commerce"]
+}
